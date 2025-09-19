@@ -12,16 +12,14 @@ from brickgpt.data.brick_structure import Brick, BrickStructure
 from .config import BrickRule, MollyConfig
 from .units import PitchSystem
 
-
-@dataclass(slots=True)
+@dataclass(slots=True)
 class OptimizationRequest:
     occupancy: np.ndarray
     pitch: PitchSystem
     rules: Iterable[BrickRule]
     colors: dict[str, Any] = field(default_factory=dict)
 
-
-@dataclass(slots=True)
+@dataclass(slots=True)
 class OptimizationResult:
     structure: BrickStructure
     metrics: dict[str, float]
@@ -36,13 +34,14 @@ class OptimizerV2:
     def __init__(self, config: MollyConfig, pitch: PitchSystem):
         self.config = config
         self.pitch = pitch
-        self.catalog = self._build_catalog(config.packing)
+        self.default_catalog = self._build_catalog(config.packing)
 
     def plan(self, request: OptimizationRequest | None = None) -> OptimizationResult:
         if request is None:
             raise ValueError("OptimizationRequest must be provided")
         occupancy = request.occupancy.astype(bool)
-        bricks = self._tile_volume(occupancy)
+        catalog = self._catalog_from_request(request)
+        bricks = self._tile_volume(occupancy, catalog)
         if bricks:
             extent = max(max(b.x + b.h, b.y + b.w, b.z + 1) for b in bricks)
         else:
@@ -51,7 +50,13 @@ class OptimizerV2:
         world_dim = max(int(extent), grid_extent, 1)
         structure = BrickStructure(bricks=list(bricks), world_dim=world_dim)
         metrics = self._compute_metrics(structure, occupancy)
-        return OptimizationResult(structure=structure, metrics=metrics, catalog=list(self.catalog))
+        return OptimizationResult(structure=structure, metrics=metrics, catalog=list(catalog))
+
+    def _catalog_from_request(self, request: OptimizationRequest) -> list[BrickRule]:
+        rules = list(request.rules)
+        if not rules:
+            return list(self.default_catalog)
+        return self._normalize_catalog(rules)
 
     def _compute_metrics(self, structure: BrickStructure, occupancy: np.ndarray) -> dict[str, float]:
         placed = np.zeros_like(occupancy, dtype=bool)
@@ -65,7 +70,7 @@ class OptimizerV2:
             "avg_brick_area": avg_area,
         }
 
-    def _tile_volume(self, occupancy: np.ndarray) -> list[Brick]:
+    def _tile_volume(self, occupancy: np.ndarray, catalog: list[BrickRule]) -> list[Brick]:
         filled = np.zeros_like(occupancy, dtype=bool)
         bricks: list[Brick] = []
         x_max, y_max, z_max = occupancy.shape
@@ -74,21 +79,28 @@ class OptimizerV2:
                 for y in range(y_max):
                     if not occupancy[x, y, z] or filled[x, y, z]:
                         continue
-                    brick = self._select_brick(occupancy, filled, x, y, z)
+                    brick = self._select_brick(occupancy, filled, x, y, z, catalog)
                     bricks.append(brick)
                     filled[brick.slice] = True
         return bricks
 
-    def _select_brick(self, occupancy: np.ndarray, filled: np.ndarray, x: int, y: int, z: int) -> Brick:
-        for dims in self.catalog:
-            h, w = self._parse_dims(dims.name)
+    def _select_brick(
+        self,
+        occupancy: np.ndarray,
+        filled: np.ndarray,
+        x: int,
+        y: int,
+        z: int,
+        catalog: list[BrickRule],
+    ) -> Brick:
+        for rule in catalog:
+            h, w = self._parse_dims(rule.name)
             if h == 0 or w == 0:
                 continue
             if self._can_place(occupancy, filled, x, y, z, h, w):
                 return Brick(h=h, w=w, x=x, y=y, z=z)
             if h != w and self._can_place(occupancy, filled, x, y, z, w, h):
                 return Brick(h=w, w=h, x=x, y=y, z=z)
-        # Fallback to 1x1 brick
         return Brick(h=1, w=1, x=x, y=y, z=z)
 
     def _can_place(
@@ -123,13 +135,21 @@ class OptimizerV2:
         catalog = list(getattr(packing, "allowed_bricks", {}).values())
         if "1x1" not in getattr(packing, "allowed_bricks", {}):
             catalog.append(BrickRule(name="1x1", weight=1.0, preference="fallback"))
+        return self._normalize_catalog(catalog)
+
+    def _normalize_catalog(self, rules: Iterable[BrickRule]) -> list[BrickRule]:
+        unique: dict[str, BrickRule] = {}
+        for rule in rules:
+            unique[rule.name] = rule
+        normalized = list(unique.values())
 
         def key(rule: BrickRule) -> tuple[float, float]:
             h, w = self._parse_dims(rule.name)
             area = float(h * w) if h and w else 1.0
             return (-area, -rule.weight)
 
-        return sorted(catalog, key=key)
+        normalized.sort(key=key)
+        return normalized
 
 
 def build_optimizer(config: MollyConfig) -> OptimizerV2:
@@ -139,5 +159,4 @@ def build_optimizer(config: MollyConfig) -> OptimizerV2:
         voxel_size_mm=config.voxelization.voxel_size_mm,
     )
     return OptimizerV2(config=config, pitch=pitch)
-
 

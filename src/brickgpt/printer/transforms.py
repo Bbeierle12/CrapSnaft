@@ -68,7 +68,7 @@ class BrickPose:
         return world_to_ldu(self.translation_mm, units=self.units)
 
     def enforce_canonical_rotation(self, allow_z_only: bool = True) -> None:
-        """Project rotation into the allowed canonical set (multiples of 90°)."""
+        """Project rotation into the allowed canonical set (multiples of 90Â°)."""
 
         if allow_z_only:
             yaw = np.arctan2(self.rotation[1, 0], self.rotation[0, 0])

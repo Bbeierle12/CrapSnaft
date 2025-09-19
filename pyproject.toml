@@ -10,8 +10,9 @@ requires-python = ">=3.10"
 dependencies = [
     "bpy",
     "gurobipy",
-    "numpy<2", # lower version of numpy needed for bpy
+    "numpy<2",
     "peft",
+    "pyyaml",
     "torch",
     "transformers",
 ]
@@ -24,6 +25,7 @@ finetuning = [
 
 [project.scripts]
 infer = "brickgpt.infer:main"
+mollyc = "brickgpt.molly.cli:main"
 prepare_finetuning_dataset = "brickgpt.prepare_finetuning_dataset:main"
 render_bricks = "brickgpt.render_bricks:main"
 
@@ -33,3 +35,4 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = ["pytest"]
+

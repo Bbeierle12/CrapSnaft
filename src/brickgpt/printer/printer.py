@@ -1,4 +1,4 @@
-"""Virtual printer invariant maintenance (Section 15)."""
+﻿"""Virtual printer invariant maintenance (Section 15)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,8 @@ from typing import Iterable, Sequence
 
 import numpy as np
 
-from . import insertion, statics, transforms, units
+from . import insertion, statics, transforms
+from . import units as units_module
 from .collision import swept_collision
 from .connections import StudTubeConstraint
 
@@ -37,8 +38,8 @@ __all__ = [
 @dataclass(slots=True)
 class VirtualPrinterState:
     world_shape: tuple[int, int, int] = (20, 20, 20)
-    units: units.CanonicalUnits = units.DEFAULT_UNITS
-    lattice: units.StudLattice = field(default_factory=units.StudLattice)
+    units: units_module.CanonicalUnits = units_module.DEFAULT_UNITS
+    lattice: units_module.StudLattice = field(default_factory=units_module.StudLattice)
     occupancy: np.ndarray = field(init=False)
 
     def __post_init__(self) -> None:
@@ -49,7 +50,7 @@ class VirtualPrinterState:
             raise ValueError("Occupancy grids must match world shape")
 
     def _quantized_translation(self, pose: transforms.BrickPose) -> bool:
-        idx, snapped = units.snap_to_stud(pose.translation_mm, lattice=self.lattice)
+        idx, snapped = units_module.snap_to_stud(pose.translation_mm, lattice=self.lattice)
         return np.allclose(snapped, pose.translation_mm, atol=1e-6)
 
     def _collision_free(self, part_grid: np.ndarray) -> bool:
@@ -113,3 +114,4 @@ class VirtualPrinterState:
     def commit(self, part_grid: np.ndarray) -> None:
         self._assert_shape(part_grid)
         self.occupancy |= part_grid.astype(bool)
+
