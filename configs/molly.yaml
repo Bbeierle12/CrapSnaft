@@ -1,0 +1,199 @@
+# Project Molly - Phase 3 Main Configuration
+# Complete configuration for the molly compiler pipeline
+
+# MODEL INPUT
+model:
+  path: "blender/exports/molly_voxel.stl"  # Path to voxelized STL file
+  format: "stl"                            # Input format
+  units: "auto"                           # Units: {mm,cm,m,auto} - auto-detect from file
+
+# VOXELIZATION PARAMETERS
+voxelization:
+  voxel_size_mm: 4.0        # Voxel size in millimeters (from Blender remesh)
+  layer_height_mm: 3.2      # LEGO brick height in mm (standard plate)
+  pitch_mm: 8.0             # LEGO stud pitch in millimeters
+  
+  # Derived calculations (computed at runtime)
+  # studs_per_voxel: computed as voxel_size_mm / pitch_mm
+  # layers_per_voxel: computed as voxel_size_mm / layer_height_mm
+
+# COORDINATE SYSTEM
+coordinates:
+  origin: "belly_center"     # Reference point at Z=0
+  orientation: "lego_standard"  # X=width, Y=depth, Z=height
+  up_axis: "z"              # Vertical axis
+
+# TECHNIC STRUCTURAL CORE
+technic_core:
+  enable: true
+  
+  # Longitudinal spines (main structural beams)
+  spines:
+    count: 2                 # Two parallel spines
+    coverage: 0.67           # Cover 2/3 of model length
+    height_position: "mid_torso"  # Place at mid-height of torso
+    beam_type: "technic_beam"     # Use Technic beams
+    
+  # Cross-ties (perpendicular connections)
+  cross_ties:
+    spacing_studs: 6         # Every 6-8 studs
+    max_spacing_studs: 8
+    connection_type: "technic_pin"
+    
+  # Connection points for modules
+  module_connections:
+    head_neck: true          # Detachable head
+    torso_hips: true         # Separable at waist
+    tail_attachment: true    # Removable tail
+
+# BRICK PACKING RULES
+packing:
+  # Allowed brick dimensions (height × width in studs)
+  allowed_bricks:
+    "2x2": { weight: 1.0, preference: "normal" }
+    "2x3": { weight: 1.0, preference: "normal" }
+    "2x4": { weight: 1.2, preference: "preferred" }
+    "2x6": { weight: 1.1, preference: "normal" }
+    "2x8": { weight: 1.0, preference: "normal" }
+    
+    "3x2": { weight: 1.0, preference: "normal" }
+    "3x3": { weight: 1.0, preference: "normal" }
+    "3x4": { weight: 1.2, preference: "preferred" }
+    "3x6": { weight: 1.1, preference: "normal" }
+    "3x8": { weight: 1.0, preference: "normal" }
+    
+    "4x2": { weight: 1.0, preference: "normal" }
+    "4x4": { weight: 1.3, preference: "highly_preferred" }
+    "4x6": { weight: 1.1, preference: "normal" }
+    "4x8": { weight: 1.0, preference: "normal" }
+    
+    # Limited 1×N usage
+    "1x1": { weight: 0.5, preference: "detail_only" }
+    "1x2": { weight: 0.3, preference: "discouraged" }
+
+  # Packing preferences
+  preferences:
+    minimize_1x_bricks: true
+    favor_larger_bricks: true
+    maintain_structural_integrity: true
+    optimize_seam_placement: true
+
+# OPTIMIZATION WEIGHTS
+# These control the multi-objective optimization scoring
+weights:
+  # Cost and efficiency
+  cost: 0.25                # Minimize total cost
+  lots: 0.15               # Minimize number of different brick types
+  
+  # Structural quality
+  seam: 0.20               # Minimize visible seams
+  strength: 0.15           # Maximize structural strength
+  
+  # Build quality
+  short_penalty: 0.10      # Penalize short bricks in long spans
+  orientation: 0.10        # Prefer consistent brick orientation
+  
+  # Aesthetic considerations
+  symmetry: 0.05           # Maintain bilateral symmetry where possible
+
+# VALIDATOR SETTINGS
+validation:
+  checks:
+    exact_cover: true        # Ensure complete model coverage
+    no_collisions: true      # Prevent brick collisions
+    connectivity: true       # Verify all pieces connect
+    cantilever: true        # Check for unsupported overhangs
+    span_limits: true       # Enforce maximum unsupported spans
+    stagger_joints: true    # Ensure staggered joint placement
+    
+  limits:
+    max_cantilever_studs: 3  # Maximum unsupported overhang
+    max_span_studs: 6       # Maximum unsupported span
+    min_overlap_studs: 2    # Minimum brick overlap for joints
+
+# ORDERING AND SCHEDULING
+ordering:
+  algorithm: "spatial_hash"   # Use spatial hashing for efficiency
+  lookahead: 3               # Plan 3 layers ahead
+  
+  # Build order preferences
+  strategy: "bottom_up"      # Build from base upward
+  module_order: ["base", "torso", "neck", "head", "tail"]
+  
+  # Feasibility checking
+  use_cached_blockers: true  # Cache collision detection
+  enable_sub_linear_checks: true  # Optimize feasibility tests
+
+# OUTPUT CONFIGURATION
+output:
+  # File formats
+  formats:
+    ldr: true               # LDraw format
+    mpd: true              # Multi-part document with submodels
+    io: true               # Instruction format
+    bom: true              # Bill of materials
+    
+  # Directory structure
+  base_dir: "out"
+  layer_dir: "out/molly_layers"
+  
+  # LDraw export settings
+  ldraw:
+    units: "ldu"            # LDraw units (keep integer)
+    use_submodels: true     # Create MPD with submodels
+    add_steps: true         # Include 0 STEP commands
+    add_rotations: true     # Include 0 ROTSTEP commands
+    
+  # BOM settings
+  bom:
+    format: "bricklink_xml"  # BrickLink Wanted List format
+    optimize_lots: true      # Minimize lot purchases
+    include_pricing: true    # Include price estimates
+    group_by_module: true    # Separate BOM per module
+
+# COLOR MAPPING
+colors:
+  # Primary color scheme (from targets.yaml)
+  primary: "BROWN"          # Main body color
+  accent: "TRANS_BROWN"     # Transparent elements
+  
+  # LDraw color codes
+  ldraw_mapping:
+    "BROWN": 6              # Brown
+    "TRANS_BROWN": 34       # Trans Brown
+    "TRANS_BLACK": 33       # Trans Black (fallback)
+    "BLACK": 0              # Black
+    "RED": 4                # Red
+    
+  # Fallback strategy
+  enable_fallbacks: true
+  fallback_rules:
+    "TRANS_BROWN": "TRANS_BLACK"
+    "BROWN": "REDDISH_BROWN"
+
+# PERFORMANCE SETTINGS
+performance:
+  max_iterations: 1000      # Maximum optimization iterations
+  convergence_threshold: 0.01  # Stop when improvement < threshold
+  parallel_workers: 4       # Number of parallel processing threads
+  memory_limit_gb: 8       # Memory usage limit
+  
+  # Caching
+  enable_caching: true
+  cache_dir: ".molly_cache"
+
+# DEBUG AND LOGGING
+debug:
+  enable_verbose_logging: false
+  save_intermediate_results: false
+  export_debug_visualizations: false
+  
+  # Progress reporting
+  report_progress: true
+  progress_interval: 10     # Report every N iterations
+
+# EXPERIMENTAL FEATURES
+experimental:
+  enable_ai_suggestions: false    # Future: AI-assisted optimization
+  adaptive_weights: false        # Future: Dynamic weight adjustment
+  multi_material: false          # Future: Mixed material support

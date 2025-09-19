@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from brickgpt.printer import printer as printer_core, transforms as printer_transforms, units as printer_units
 from brickgpt.stability_analysis import stability_score, StabilityConfig, connectivity_score
 from .brick_library import (brick_library,
                            dimensions_to_brick_id, brick_id_to_dimensions,
@@ -58,16 +59,24 @@ class Brick:
         }
 
     def to_txt(self) -> str:
-        return f'{self.h}x{self.w} ({self.x},{self.y},{self.z})\n'
+        return f"{self.h}x{self.w} ({self.x},{self.y},{self.z})\n"
 
     def to_ldr(self, base_height: float = 0) -> str:
-        x = (self.x + self.h * 0.5) * 20
-        z = (self.y + self.w * 0.5) * 20
-        y = (self.z + base_height) * -24
+        studs_ldu = printer_units.DEFAULT_UNITS.stud_pitch_ldu
+        brick_ldu = printer_units.DEFAULT_UNITS.plate_height_ldu * 3
+        x = (self.x + self.h * 0.5) * studs_ldu
+        z = (self.y + self.w * 0.5) * studs_ldu
+        y = (self.z + base_height) * -brick_ldu
         matrix = '0 0 1 0 1 0 -1 0 0' if self.ori == 0 else '-1 0 0 0 1 0 0 0 -1'
-        line = f'1 115 {x} {y} {z} {matrix} {self.part_id}\n'
+        line = f"1 115 {x:.1f} {y:.1f} {z:.1f} {matrix} {self.part_id}\n"
         step_line = '0 STEP\n'
         return line + step_line
+
+    def to_pose(self, units: printer_units.CanonicalUnits = printer_units.DEFAULT_UNITS) -> printer_transforms.BrickPose:
+        rotation = np.eye(3)
+        if self.ori == 1:
+            rotation = printer_transforms.rotation_about('z', np.pi / 2)
+        return printer_transforms.BrickPose.from_lattice((self.x, self.y, self.z), rotation=rotation, units=units)
 
     @classmethod
     def from_json(cls, brick_json: dict):
@@ -105,9 +114,11 @@ class Brick:
                 if ori == 1:
                     h, w = w, h
 
-                x = int(x0 / 20 - h * 0.5)
-                y = int(z0 / 20 - w * 0.5)
-                z = int(-y0 / 24)
+                studs_ldu = printer_units.DEFAULT_UNITS.stud_pitch_ldu
+                brick_ldu = printer_units.DEFAULT_UNITS.plate_height_ldu * 3
+                x = int(x0 / studs_ldu - h * 0.5)
+                y = int(z0 / studs_ldu - w * 0.5)
+                z = int(-y0 / brick_ldu)
 
                 return cls(h=h, w=w, x=x, y=y, z=z)
             case _:
@@ -152,6 +163,11 @@ class BrickStructure:
 
     def to_ldr(self) -> str:
         return ''.join([brick.to_ldr() for brick in self.bricks])
+
+    def to_printer_state(self, units: printer_units.CanonicalUnits = printer_units.DEFAULT_UNITS) -> printer_core.VirtualPrinterState:
+        state = printer_core.VirtualPrinterState(world_shape=self.voxel_occupancy.shape, units=units)
+        state.occupancy = self.voxel_occupancy.astype(bool)
+        return state
 
     def add_brick(self, brick: Brick) -> None:
         self.bricks.append(brick)

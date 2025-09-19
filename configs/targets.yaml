@@ -1,0 +1,78 @@
+# Project Molly - Phase 0 Targets Configuration
+# Lock targets for dimensional constraints, palette, and color specifications
+
+# LOCKED DIMENSIONS
+# Based on recommendation: lock length = 23.4" and adjust head/neck pose later if needed
+dimensions:
+  locked_axis: "length"  # Which dimension to hold fixed
+  locked_value: 23.4     # inches - primary constraint
+  locked_value_mm: 594.36  # mm equivalent (23.4 * 25.4)
+  target_height: 13.8    # inches - secondary target (adjustable via pose)
+  target_height_mm: 350.52  # mm equivalent
+
+# BRICK PALETTE CONSTRAINTS
+# Allowed brick sizes with format: height×width (in studs)
+palette:
+  allowed_sizes:
+    # 2×N bricks (2 studs wide)
+    "2x2": true
+    "2x3": true
+    "2x4": true
+    "2x6": true
+    "2x8": true
+    
+    # 3×N bricks (3 studs wide)  
+    "3x2": true
+    "3x3": true
+    "3x4": true
+    "3x6": true
+    "3x8": true
+    
+    # 4×N bricks (4 studs wide)
+    "4x2": true
+    "4x4": true
+    "4x6": true
+    "4x8": true
+    
+    # 1×N bricks (limited use - for details only)
+    "1x1": true   # round tiles for details
+    "1x2": true   # minimal use
+    "1x3": false  # discouraged
+    "1x4": false  # discouraged
+    "1x6": false  # discouraged
+    "1x8": false  # discouraged
+
+  # Usage preferences
+  preferences:
+    discourage_1x: true      # Minimize 1×N bricks except for details
+    prefer_larger: true      # Favor 4×N and 3×N over 2×N when possible
+    technic_core: true       # Allow Technic beams for structural spine
+
+# COLOR PALETTE & FALLBACKS
+colors:
+  primary: "BROWN"           # Main body color
+  accent: "TRANS_BROWN"      # Transparent elements (eyes, details)
+  
+  # Fallback mapping for unavailable parts
+  fallbacks:
+    "TRANS_BROWN": "TRANS_BLACK"  # If transparent brown unavailable
+    "BROWN": "REDDISH_BROWN"      # If standard brown unavailable
+    
+  # Special element colors
+  details:
+    eyes: "TRANS_BROWN"      # Transparent for realistic look
+    nose: "BLACK"            # Contrasting nose
+    collar: "RED"            # Optional collar accent
+
+# STRUCTURAL REQUIREMENTS
+structure:
+  minimum_wall_thickness: 2  # studs - prevent thin walls
+  require_technic_spine: true # Longitudinal beams for strength
+  spine_coverage: 0.67       # Fraction of length covered by spine
+  cross_tie_spacing: 6       # studs between cross-connections
+  
+# BUDGET CONSTRAINTS (optional - uncomment and adjust as needed)
+# budget:
+#   target_piece_count: 800    # Approximate target piece count
+#   max_cost_usd: 150         # Maximum estimated cost
+#   prefer_common_parts: true  # Favor readily available pieces
