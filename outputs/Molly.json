@@ -1,0 +1,34 @@
+{
+  "bricks": [
+    {
+      "brick_id": "3001",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "color": 4
+    },
+    {
+      "brick_id": "3003",
+      "position": [
+        4,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "color": 4
+    }
+  ],
+  "source": "uploads\\Molly.stl",
+  "total_bricks": 2
+}

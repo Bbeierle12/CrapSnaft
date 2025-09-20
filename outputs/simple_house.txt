@@ -1,0 +1,22 @@
+# LEGO Model: simple_house
+# Generated from: A small yellow house with red roof
+# Total bricks: 18
+
+Place 2x4 brick at (0, 0, 0) with color 14
+Place 2x4 brick at (0, 0, 16) with color 14
+Place 2x4 brick at (16, 0, 0) with color 14
+Place 2x4 brick at (16, 0, 16) with color 14
+Place 2x2 brick at (0, 8, 0) with color 14
+Place 2x2 brick at (0, 8, 16) with color 14
+Place 2x2 brick at (16, 8, 0) with color 14
+Place 2x2 brick at (16, 8, 16) with color 14
+Place 1x4 brick at (4, 8, 0) with color 14
+Place 1x4 brick at (4, 8, 16) with color 14
+Place 1x4 brick at (12, 8, 0) with color 14
+Place 1x4 brick at (12, 8, 16) with color 14
+Place 2x2 brick at (4, 16, 4) with color 4
+Place 2x2 brick at (12, 16, 4) with color 4
+Place 2x2 brick at (4, 16, 12) with color 4
+Place 2x2 brick at (12, 16, 12) with color 4
+Place 1x2 brick at (8, 20, 6) with color 4
+Place 1x2 brick at (8, 20, 10) with color 4

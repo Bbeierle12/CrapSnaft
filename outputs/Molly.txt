@@ -1,0 +1,4 @@
+# Mock LEGO conversion from uploads\Molly.stl
+# 2x4 brick at (0,0,0)
+# 2x2 brick at (4,0,0)
+# Total: 2 bricks

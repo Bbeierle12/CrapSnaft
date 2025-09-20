@@ -1,0 +1,29 @@
+# LEGO Model: sample_castle
+# Generated from: A small red castle with blue towers
+# Total bricks: 25
+
+Place 2x4 brick at (0, 0, 0) with color 4
+Place 2x4 brick at (16, 0, 0) with color 4
+Place 2x4 brick at (0, 0, 16) with color 4
+Place 2x4 brick at (16, 0, 16) with color 4
+Place 2x2 brick at (8, 0, 0) with color 4
+Place 2x2 brick at (8, 0, 16) with color 4
+Place 2x2 brick at (0, 0, 8) with color 4
+Place 2x2 brick at (16, 0, 8) with color 4
+Place 1x4 brick at (4, 8, 0) with color 1
+Place 1x4 brick at (12, 8, 0) with color 1
+Place 1x4 brick at (4, 8, 16) with color 1
+Place 1x4 brick at (12, 8, 16) with color 1
+Place 1x2 brick at (0, 16, 0) with color 1
+Place 1x2 brick at (16, 16, 0) with color 1
+Place 1x2 brick at (0, 16, 16) with color 1
+Place 1x2 brick at (16, 16, 16) with color 1
+Place 1x1 brick at (0, 24, 0) with color 14
+Place 1x1 brick at (16, 24, 0) with color 14
+Place 1x1 brick at (0, 24, 16) with color 14
+Place 1x1 brick at (16, 24, 16) with color 14
+Place 2x2 brick at (8, 8, 8) with color 4
+Place 1x2 brick at (6, 16, 8) with color 6
+Place 1x2 brick at (10, 16, 8) with color 6
+Place 1x1 brick at (8, 24, 8) with color 14
+Place 1x1 brick at (9, 24, 8) with color 14

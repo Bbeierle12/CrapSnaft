@@ -1,0 +1,41 @@
+# LEGO Model Generated from: "red car"
+# Generation seed: 42
+# Total bricks: 36
+
+# Generated brick placement:
+2x2 brick at (64, 56, 28.799999999999997) color 4
+2x4 brick at (136, 16, 86.39999999999999) color 4
+1x4 brick at (0, 16, 28.799999999999997) color 4
+2x4 brick at (152, 0, 76.8) color 6
+2x4 brick at (104, 56, 67.2) color 6
+2x3 brick at (0, 40, 57.599999999999994) color 2
+1x2 brick at (32, 48, 48.0) color 2
+2x2 brick at (96, 24, 48.0) color 4
+1x2 brick at (64, 8, 67.2) color 6
+2x3 brick at (96, 16, 76.8) color 4
+1x2 brick at (88, 144, 28.799999999999997) color 6
+1x1 brick at (8, 56, 38.4) color 4
+2x2 brick at (24, 96, 38.4) color 1
+1x4 brick at (40, 88, 48.0) color 2
+2x4 brick at (160, 16, 86.39999999999999) color 2
+1x1 brick at (136, 56, 19.2) color 1
+1x4 brick at (64, 160, 76.8) color 14
+2x4 brick at (8, 56, 0.0) color 2
+1x2 brick at (64, 16, 28.799999999999997) color 14
+2x3 brick at (48, 160, 67.2) color 2
+1x4 brick at (32, 64, 19.2) color 14
+2x4 brick at (136, 64, 86.39999999999999) color 6
+1x4 brick at (96, 88, 28.799999999999997) color 6
+2x4 brick at (120, 16, 0.0) color 6
+2x2 brick at (160, 40, 96.0) color 1
+1x4 brick at (16, 96, 57.599999999999994) color 6
+2x3 brick at (128, 64, 76.8) color 14
+2x2 brick at (136, 64, 96.0) color 4
+1x2 brick at (72, 104, 19.2) color 4
+1x4 brick at (64, 128, 19.2) color 4
+2x3 brick at (160, 72, 96.0) color 4
+2x3 brick at (48, 32, 48.0) color 6
+2x4 brick at (128, 0, 86.39999999999999) color 6
+1x2 brick at (0, 24, 48.0) color 14
+1x2 brick at (8, 56, 86.39999999999999) color 1
+2x2 brick at (120, 16, 76.8) color 4
